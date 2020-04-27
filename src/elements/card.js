@@ -82,7 +82,6 @@ const Card = (props) => {
   const classes = useStyles();
   let timeText = timeConverter(timestamp);
   let [icon, bgcolor] = iconRender(type);
-  console.log(icon);
   return (
     <div className={classes.root}>
       <ExpansionPanel style={{ backgroundColor: bgcolor }}>

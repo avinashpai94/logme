@@ -1,0 +1,44 @@
+[
+  {
+    "timestamp": 1587046936,
+    "accesstoken": 1,
+    "type": "error",
+    "key": "Sample Error",
+    "text": "This is an error message"
+  },
+  {
+    "timestamp": 1587346936,
+    "accesstoken": 1,
+    "type": "warning",
+    "key": "Sample warning",
+    "text": "This is a warning message"
+  },
+  {
+    "timestamp": 1587446936,
+    "accesstoken": 1,
+    "type": "alert",
+    "key": "Sample alert",
+    "text": "This is an alert message"
+  },
+  {
+    "timestamp": 1587546936,
+    "accesstoken": 1,
+    "type": "debug",
+    "key": "Sample debug",
+    "text": "This is a debug message"
+  },
+  {
+    "timestamp": 1587846936,
+    "accesstoken": 1,
+    "type": "error",
+    "key": "Sample Error",
+    "text": "This is an error message"
+  },
+  {
+    "timestamp": 1587946936,
+    "accesstoken": 1,
+    "type": "debug",
+    "key": "Sample debug",
+    "text": "This is a debug message"
+  }
+]
