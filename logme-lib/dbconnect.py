@@ -18,8 +18,10 @@ def save(data_dic):
     db = firebase.database()
     email = data_dic['email']
     email = hashlib.md5(email.encode()).hexdigest()
+    print(email)
     accesstoken = data_dic['accesstoken']
-    if db.child("users").child(email).child(accesstoken).shallow().get().val():
+    print(accesstoken)
+    if accesstoken in db.child("users").child(email).shallow().get().val():
         print("User and Access Token Exist")
         ts_md5 = data_dic['timestamp'][0]
         ts = data_dic['timestamp'][1]
@@ -35,3 +37,6 @@ def save(data_dic):
         db.child("users").child(email).child(accesstoken).child(ts_md5).set(data_dic)
     else:
         print("User and Access Token does not exist")
+# firebase = Firebase(config)
+# db = firebase.database()
+# print(db.child("users").child("9f63c41218def117d2017a8f83d1a770").shallow().get().val())
