@@ -10,7 +10,7 @@ config = {
   "authDomain": "errorlogger-c8536.firebaseapp.com",
   "databaseURL": "https://errorlogger-c8536.firebaseio.com",
   "storageBucket": "errorlogger.appspot.com",
-  "serviceAccount": "C:/Users/anj24/Downloads/errorlogger-d5dc9028e1af.json"
+  "serviceAccount": "firebase-key/errorlogger-d5dc9028e1af.json"
 }
 
 def save(data_dic):
