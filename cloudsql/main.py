@@ -52,12 +52,10 @@ def getkey():
     email_obj = hashlib.md5(email.encode())
     email_hex=email_obj.hexdigest()
 
-
     timestamp=datetime.utcnow()
     email_time=str(email)+str(timestamp)
     access_obj = hashlib.md5(email_time.encode())
     access_hex=access_obj.hexdigest()
-
 
     if not db.child('users').child(email_hex).shallow().get().val(): # if email doesn't exist
 
@@ -79,9 +77,7 @@ def getkey():
 
 
     device_data={access_hex:device}
-
     db.child('devices').update(device_data)
-
     js = json.dumps(device_data)
      # statusval=200
 
@@ -91,9 +87,9 @@ def getkey():
     # js = json.dumps(device_data)
      # statusval=400
 
-    # resp = Response(js, status=statusval, mimetype='application/json')
+    resp = Response(js, status=200, mimetype='application/json')
     # resp.headers['Link'] = 'http://127.0.0.1:5000/add_device?email='+email+'&device='+device
-    return(js)
+    return(resp)
 
 
 
@@ -147,12 +143,16 @@ def unread():
     email_hex=email_obj.hexdigest()
     if not db.child('users').child(email_hex).shallow().get().val(): #email doesnt exist
       #db.setValue(hash_hex);
-        return ("User doesn't exist")
+        #return ("User doesn't exist")
+        return flask.Response("User doesn't exist",status=404,mimetype='text/plain')
+
     def event_stream():
         while True:
             # wait for source data to be available, then push it
             yield 'data: {}\n\n'.format(getnotifications(email_hex))
-    return flask.Response(event_stream(), mimetype="text/event-stream")
+    #return flask.Response(event_stream(),status=200,mimetype="text/event-stream")
+        return flask.Response(event_stream(),status=200,headers={'ContentType':'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive'})
+
 
 
 
