@@ -40,3 +40,5 @@ def save(data_dic):
 # firebase = Firebase(config)
 # db = firebase.database()
 # print(db.child("users").child("9f63c41218def117d2017a8f83d1a770").shallow().get().val())
+
+#db.child('users').child('9f63c41218def117d2017a8f83d1a770').update({'0c50e2c77928995f8e9ac398a42168ce':0})
