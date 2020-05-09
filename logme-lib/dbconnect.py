@@ -2,6 +2,7 @@
 # Rename crypto folder in venv/lib/site-packages/ to Crypto
 
 from firebase import Firebase
+import hashlib
 
 # From Firebase - settings - project settings
 config = {
@@ -15,10 +16,22 @@ config = {
 def save(data_dic):
     firebase = Firebase(config)
     db = firebase.database()
-    email = data_dic['email'].split('@')[0]
+    email = data_dic['email']
+    email = hashlib.md5(email.encode()).hexdigest()
     accesstoken = data_dic['accesstoken']
-    timestamp = int(data_dic['timestamp'])
-    keys_remove = ['email', 'accesstoken', 'timestamp']
-    for key in keys_remove:
-        del data_dic[key]
-    db.child(email).child(accesstoken).child(timestamp).set(data_dic)
+    if db.child("users").child(email).child(accesstoken).shallow().get().val():
+        print("User and Access Token Exist")
+        ts_md5 = data_dic['timestamp'][0]
+        ts = data_dic['timestamp'][1]
+        keys_remove = ['email', 'timestamp']
+        for key in keys_remove:
+            del data_dic[key]
+        data_dic['timestamp'] = ts
+        device_name = db.child("devices").child(accesstoken).shallow().get().val()
+        if device_name:
+            data_dic['device'] = device_name
+        else:
+            data_dic['device'] = "Device does not exist"
+        db.child("users").child(email).child(accesstoken).child(ts_md5).set(data_dic)
+    else:
+        print("User and Access Token does not exist")

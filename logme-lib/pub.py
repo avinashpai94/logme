@@ -9,5 +9,4 @@ def send_message(project_id, topic_name, data):
     print(future.result())
 
     print("Published messages.")
-# .\venv\Scripts\activate
-# set GOOGLE_APPLICATION_CREDENTIALS=C:\Users\anj24\Downloads\errorlogger-d5dc9028e1af.json
+# .\venv\Scripts\activate & set GOOGLE_APPLICATION_CREDENTIALS=C:\Users\anj24\Downloads\errorlogger-d5dc9028e1af.json
