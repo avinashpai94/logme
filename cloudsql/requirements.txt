@@ -8,4 +8,8 @@ pycryptodome
 firebase
 sseclient
 Crypto
-firebase-admin
+#firebase-admin
+python_jwt
+gcloud
+google-cloud-storage
+flask_cors

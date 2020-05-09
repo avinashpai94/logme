@@ -22,6 +22,12 @@ from datetime import datetime
 import time
 import json
 
+from flask_cors import CORS, cross_origin
+
+
+
+
+
 config = {
   "apiKey": "AIzaSyA4UPj1_g5KDqMPTkVPqF4Kh7S1dnIgU0Q",
   "authDomain": "errorlogger-c8536.firebaseapp.com",
@@ -33,6 +39,8 @@ config = {
 
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 firebase = Firebase(config)
 db = firebase.database()
 
@@ -42,6 +50,7 @@ def homepage():
     return(jsonify("Welcome"))
 
 @app.route('/add_device',methods=['GET'])
+@cross_origin()
 def getkey():
     # When deployed to App Engine, the `GAE_ENV` environment variable will be
     # set to `standard`
@@ -111,52 +120,49 @@ def getaccesstoken():
 
 def getnotifications(email_hex):
        dict_accesstokens=db.child('users').child(email_hex).get().val() #get accesstokens, will have one accesstoken fro sure
-       print("dictvalues",dict_accesstokens.values())
+       #print("dict",(dict_accesstokens))
        accessVal_List=dict_accesstokens.values() #values of accesstokens, could be [0,0,{ts:{}}]
        result_array=[]
 
-       # for key, value in dict_accesstokens.items():
-       #  for item in accessVal_List: #item--> [0,0, {ts:{}}]
-       #    print("item",item)
-       #    if(item!=0):                           #timestamp values exists
-       #     for val in item.values():  #val--> {device:0, level:1, msgs:"warning"}
-       #       result_array.append(val)
-
-       for access_hex, values in dict_accesstokens.items():
-           for item in values: #item--> [0,0, {ts:{}}]
-               print("access_token",access_hex)
-               if(item!=0):                           #timestamp values exists
-                  for val in item.values():  #val--> {device:0, level:1, msgs:"warning"}
+       for access_hex, items in dict_accesstokens.items(): #dict_accesstokens={acs1:0,acs2:0,acs3:{ts}}
+               #print("items",items)
+               if(items!=0):                           #timestamp values exists  items--> [0,0, {ts:{}}]
+                  for key,val in items.items():  #val--> {device:0, level:1, msgs:"warning"}
+                    print("value",val)
                     result_array.append(val)
-                    db.child('users').child(email_hex).update(
-                        {
-                          access_hex:0
-                        })
+                  #print("result array",result_array)
+                  db.child('users').child(email_hex).update(
+                                   {
+                                     access_hex:0
 
-
+                                })
        return(result_array) #no quotes email
 
 @app.route('/unread')
+@cross_origin()
 def unread():
     email = request.args.get('email')
     email_obj = hashlib.md5(email.encode())
     email_hex=email_obj.hexdigest()
+    data_val=getnotifications(email_hex)
+    #print("email",email_hex)
+    #return Response(json.dumps(data_val))
     if not db.child('users').child(email_hex).shallow().get().val(): #email doesnt exist
       #db.setValue(hash_hex);
         #return ("User doesn't exist")
-        return flask.Response("User doesn't exist",status=404,mimetype='text/plain')
+        return Response("User doesn't exist",status=404,mimetype='text/plain')
 
     def event_stream():
         while True:
             # wait for source data to be available, then push it
             yield 'data: {}\n\n'.format(getnotifications(email_hex))
     #return flask.Response(event_stream(),status=200,mimetype="text/event-stream")
-        return flask.Response(event_stream(),status=200,headers={'ContentType':'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive'})
+    return Response(event_stream(),status=200,headers={'ContentType':'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive'})
 
 
 
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(threaded=True)
+    app.run(host='0.0.0.0',threaded=True)
     #app.run(debug=True)
