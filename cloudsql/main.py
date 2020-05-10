@@ -119,6 +119,7 @@ def getaccesstoken():
 
 
 def getnotifications(email_hex):
+
        dict_accesstokens=db.child('users').child(email_hex).get().val() #get accesstokens, will have one accesstoken fro sure
        #print("dict",(dict_accesstokens))
        accessVal_List=dict_accesstokens.values() #values of accesstokens, could be [0,0,{ts:{}}]
@@ -128,36 +129,48 @@ def getnotifications(email_hex):
                #print("items",items)
                if(items!=0):                           #timestamp values exists  items--> [0,0, {ts:{}}]
                   for key,val in items.items():  #val--> {device:0, level:1, msgs:"warning"}
-                    print("value",val)
-                    result_array.append(val)
-                  #print("result array",result_array)
-                  db.child('users').child(email_hex).update(
+                    if(val!=0):                  #if {ts:0} already read,ignore
+                     #print("value",val)
+                     #val.replace("'",'"')
+                     result_array.append(val)
+                     #db.child('users').child(email_hex).child(access_hex).child(key).remove()
+                     #print("result array",result_array)
+                     db.child('users').child(email_hex).child(access_hex).update(
                                    {
-                                     access_hex:0
+                                     key:0
 
                                 })
-       return(result_array) #no quotes email
 
-@app.route('/unread')
+
+       return result_array #no quotes email
+
+
+def event_stream(email_hex):
+    while True:
+        # wait for source data to be available, then push it
+        data=getnotifications(email_hex)
+        #print("after notiifications, inside event_sstream",data)
+        yield 'data: {}\n\n'.format(data)
+
+
+
+
+@app.route('/unread',methods=['GET'])
 @cross_origin()
 def unread():
+    #print("inside unread")
     email = request.args.get('email')
     email_obj = hashlib.md5(email.encode())
     email_hex=email_obj.hexdigest()
-    data_val=getnotifications(email_hex)
+    #data_val=getnotifications(email_hex)
     #print("email",email_hex)
     #return Response(json.dumps(data_val))
     if not db.child('users').child(email_hex).shallow().get().val(): #email doesnt exist
       #db.setValue(hash_hex);
         #return ("User doesn't exist")
         return Response("User doesn't exist",status=404,mimetype='text/plain')
-
-    def event_stream():
-        while True:
-            # wait for source data to be available, then push it
-            yield 'data: {}\n\n'.format(getnotifications(email_hex))
-    #return flask.Response(event_stream(),status=200,mimetype="text/event-stream")
-    return Response(event_stream(),status=200,headers={'ContentType':'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive'})
+    #return("text")
+    return Response(event_stream(email_hex),status=200,headers={'Content-Type':'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive','X-Accel-Buffering': 'no'})
 
 
 
