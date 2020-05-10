@@ -25,16 +25,18 @@ def save(data_dic):
         print("User and Access Token Exist")
         ts_md5 = data_dic['timestamp'][0]
         ts = data_dic['timestamp'][1]
-        keys_remove = ['email', 'timestamp']
-        for key in keys_remove:
-            del data_dic[key]
+        del data_dic['timestamp']
         data_dic['timestamp'] = ts
         device_name = db.child("devices").child(accesstoken).shallow().get().val()
         if device_name:
             data_dic['device'] = device_name
         else:
             data_dic['device'] = "Device does not exist"
+        keys_remove = ['email', 'accesstoken']
+        for key in keys_remove:
+            del data_dic[key]
         db.child("users").child(email).child(accesstoken).child(ts_md5).set(data_dic)
+
     else:
         print("User and Access Token does not exist")
 # firebase = Firebase(config)
