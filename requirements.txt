@@ -1,5 +1,0 @@
-pip install --upgrade google-cloud-pubsub
-# Rename async.py to asyncn.py. Modified the file name in venv/lib/site-packages/_init_.py and firebase.py
-# Rename crypto folder in venv/lib/site-packages/ to Crypto
-# .\venv\Scripts\activate & set GOOGLE_APPLICATION_CREDENTIALS=C:\Users\anj24\Downloads\errorlogger-d5dc9028e1af.json
-
